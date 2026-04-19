@@ -135,6 +135,81 @@ async def get_target(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return None, None
 
 # ══════════════════════════════════════════════════════════════════════════════
+#  COMMANDES /start ET /help
+# ══════════════════════════════════════════════════════════════════════════════
+
+START_TEXT = """
+🌑 *BIENVENUE DANS L'ANTRE DES ABYSSES*
+
+Tu as invoqué le Gardien silencieux\.
+Je veille sur ce royaume depuis les profondeurs\.
+
+Les ombres m'obéissent\. Les âmes aussi\.
+
+Tape /help pour découvrir mes pouvoirs\.
+
+🌊 _— Le Gardien des Abysses_
+"""
+
+HELP_TEXT = """
+👁️ *POUVOIRS DU GARDIEN — AIDE*
+
+━━━━━━━━━━━━━━━━━━━━
+🔨 *MODÉRATION* _\(admins uniquement\)_
+━━━━━━━━━━━━━━━━━━━━
+`/ban` — Bannir un membre
+  _↳ Réponds à son message, ou :_ `/ban @username`
+
+`/unban` — Lever un ban
+  _↳_ `/unban @username`
+
+`/mute` — Réduire au silence
+  _↳ Réponds à son message, ou :_ `/mute @username`
+
+`/unmute` — Rendre la parole
+  _↳ Réponds à son message, ou :_ `/unmute @username`
+
+`/silence` — Toggle silence total du groupe
+  _↳ Seuls les admins peuvent parler\. Re\-tape pour lever\._
+
+`/admin Titre` — Promouvoir un membre admin
+  _↳ Réponds à son message \+ ajoute un titre optionnel_
+  _↳ Ex :_ `/admin Seigneur des Ombres`
+
+━━━━━━━━━━━━━━━━━━━━
+📢 *CONVOCATIONS* _\(admins uniquement\)_
+━━━━━━━━━━━━━━━━━━━━
+`/call message` — Taguer tous les membres actifs
+  _↳ Ex :_ `/call Réunion ce soir à 21h !`
+
+`/calladmin message` — Taguer uniquement les admins
+  _↳ Ex :_ `/calladmin Urgence dans le groupe !`
+
+━━━━━━━━━━━━━━━━━━━━
+ℹ️ *NOTES*
+━━━━━━━━━━━━━━━━━━━━
+• `/call` ne tague que les membres ayant déjà parlé
+• Pour bannir par ID : `/ban 123456789`
+• Le bot doit être admin du groupe pour fonctionner
+
+🌊 _— Les Gardiens des Abysses_
+"""
+
+async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        await context.bot.send_photo(
+            chat_id=update.effective_chat.id,
+            photo=WELCOME_IMAGE_URL,
+            caption=START_TEXT,
+            parse_mode="MarkdownV2"
+        )
+    except Exception:
+        await update.message.reply_text(START_TEXT, parse_mode="MarkdownV2")
+
+async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(HELP_TEXT, parse_mode="MarkdownV2")
+
+# ══════════════════════════════════════════════════════════════════════════════
 #  CACHE DES MEMBRES (isolé par chat_id pour /call)
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -352,6 +427,8 @@ async def main():
     app.add_handler(MessageHandler(filters.ALL, cache_member), group=1)
 
     # Commandes
+    app.add_handler(CommandHandler("start",     cmd_start))
+    app.add_handler(CommandHandler("help",      cmd_help))
     app.add_handler(CommandHandler("ban",       cmd_ban))
     app.add_handler(CommandHandler("unban",     cmd_unban))
     app.add_handler(CommandHandler("mute",      cmd_mute))
